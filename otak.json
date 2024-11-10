@@ -75,6 +75,10 @@
     {
       "input": "apakah anda tahu habib?",
       "respon": "Habib adalah teman anda, yang suka tobrut tuan"
+    },
+    {
+      "input": "tahu almahyra?",
+      "respon": "Almahyra adalah adik anda tuan"
     }
   ]
 }

@@ -62,9 +62,9 @@ async function sendMessage() {
             buttonContainer.appendChild(noButton);
             chatBox.appendChild(buttonContainer);
         } else {
-            // Jika tidak ada respons mirip, tampilkan jawaban atau minta inputan baru
-            displayBotMessage(data.response);
-            if (data.response.includes("Maaf, saya belum memiliki jawaban")) {
+            // Jika tidak ada respons mirip atau jawaban belum diketahui
+            if (data.response.includes("Maaf, saya belum tahu jawabannya")) {
+                // Tampilkan prompt untuk meminta input jawaban dari pengguna
                 const userResponse = prompt("Bot belum tahu jawabannya. Mohon masukkan jawaban untuk pertanyaan ini:");
                 if (userResponse) {
                     await fetch('/learn', {
@@ -76,6 +76,8 @@ async function sendMessage() {
                     });
                     displayBotMessage("Terima kasih, saya telah mempelajari jawaban baru!");
                 }
+            } else {
+                displayBotMessage(data.response);
             }
         }
     } catch (error) {
