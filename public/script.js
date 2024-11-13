@@ -1,3 +1,13 @@
+document.addEventListener('DOMContentLoaded', function() {
+    const userInput = document.getElementById('user-input');
+    userInput.addEventListener('keypress', function(event) {
+        if (event.key === 'Enter') {
+            event.preventDefault();
+            sendMessage();
+        }
+    });
+});
+
 let pendingResponse = null; // Variabel global untuk menyimpan respons mirip yang menunggu konfirmasi
 
 async function sendMessage() {

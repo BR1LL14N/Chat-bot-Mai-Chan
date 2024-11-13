@@ -18,9 +18,38 @@
         </div>
         <div class="flex space-x-2">
             <input type="text" id="user-input" placeholder="Ketik pesan..." class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500">
-            <button onclick="sendMessage()" class="bg-blue-500 text-white px-4 py-2 rounded-lg">Kirim</button>
+            <button onclick="sendMessage()" id="submitBtn" class="bg-blue-500 text-white px-4 py-2 rounded-lg">Kirim</button>
         </div>
     </div>
+
+    <div id="live2d-widget"></div>
+
+    <script src="live2d/script/L2Dwidget.min.js" async></script>
+    <script>
+        window.addEventListener("load", function() {
+            // Pastikan script sudah di-load
+            if (typeof L2Dwidget !== "undefined") {
+                L2Dwidget.init({
+                    model: {
+                        jsonPath: "/live2d/model/sagiri/model.json",
+                        scale: 0.8
+                    },
+                    display: {
+                        position: "right",
+                        width: 480,
+                        height: 720,
+                        hOffset: -50,
+                        vOffset: -80,
+                    },
+                    mobile: {
+                        show: false,
+                    },
+                });
+            } else {
+                console.warn("L2Dwidget script is not loaded.");
+            }
+        });
+    </script>
     <script src="script.js"></script>
 </body>
 </html>
