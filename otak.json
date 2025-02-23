@@ -93,12 +93,12 @@
       "respon": "Ir. Soekarno"
     },
     {
-      "input": "mau kue?",
-      "respon": "mauuu"
+      "input": "apakah anda tahu soekarno?",
+      "respon": "soekarno adalah presiden pertama negara Indonesia"
     },
     {
-      "input": "kuentod",
-      "respon": "mau dong><"
+      "input": "Apakah anda tahu ahsan?",
+      "respon": "Ahsan adalah saudara saya"
     }
   ]
 }
