@@ -1,67 +1,75 @@
 const express = require('express');
 const fs = require('fs');
-const Fuse = require('fuse.js'); // Import Fuse.js untuk pencarian yang lebih fleksibel
+const Fuse = require('fuse.js');
+const { GoogleGenerativeAI } = require("@google/generative-ai");
+require('dotenv').config();
+
 const app = express();
 const PORT = 3000;
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 app.use(express.json());
 app.use(express.static('public'));
 
-app.post('/chat', (req, res) => {
-    const { input } = req.body;
+// Fungsi untuk mendapatkan respons dari Gemini AI dengan format yang rapi
+async function generateResponseFromGemini(prompt) {
+    try {
+        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+        const result = await model.generateContent(prompt);
+        const response = await result.response;
 
-    // Baca file JSON untuk mencari jawaban yang sesuai
-    fs.readFile('./otak.json', 'utf8', (err, data) => {
-        if (err) {
-            console.error("Gagal membaca file:", err);
-            return res.status(500).json({ message: "Gagal membaca data." });
+        if (!response || !response.candidates || response.candidates.length === 0) {
+            return "Saya tidak bisa menjawab itu saat ini.";
         }
 
-        let dataTraining;
-        try {
-            dataTraining = JSON.parse(data);
-        } catch (error) {
-            console.error("Error parsing JSON:", error);
-            return res.status(500).json({ message: "Format data tidak valid." });
-        }
+        let text = response.candidates[0].content.parts[0].text;
+        return formatResponse(text) || "Saya tidak bisa menjawab itu saat ini.";
+    } catch (error) {
+        console.error("Error dari Gemini AI:", error);
+        return "Saya tidak bisa menjawab itu saat ini.";
+    }
+}
 
-        const percakapan = dataTraining.percakapan;
+// Fungsi untuk membersihkan input pengguna
+function cleanInput(text) {
+    return text
+        .toLowerCase()
+        .replace(/\b(apakah|siapa|dimana|apa itu|tahu)\b/g, '') // Hilangkan kata tanya
+        .trim();
+}
 
-        // Cari kecocokan sempurna terlebih dahulu
-        const exactResponse = percakapan.find(p => p.input.toLowerCase() === input.toLowerCase());
-        if (exactResponse) {
-            return res.json({ response: exactResponse.respon });
-        }
+// Fungsi untuk mencari respons terbaik berdasarkan kata kunci
+function findBestMatch(input, percakapan) {
+    const cleanedInput = cleanInput(input);
 
-        // Jika tidak ada kecocokan sempurna, lakukan pencarian mirip menggunakan Fuse.js
-        const fuse = new Fuse(percakapan, { keys: ['input'], threshold: 0.4 });  // Threshold dapat diturunkan lebih jauh jika perlu
-        const similarResult = fuse.search(input);
+    // Cari jawaban yang benar-benar cocok
+    const exactResponse = percakapan.find(p => cleanInput(p.input) === cleanedInput);
+    if (exactResponse) return exactResponse.respon;
 
-        if (similarResult.length > 0) {
-            const similarInput = similarResult[0].item.input;
-            const similarResponse = similarResult[0].item.respon;
+    // Gunakan Fuse.js untuk mencari yang paling mirip
+    const fuse = new Fuse(percakapan, { keys: ['input'], threshold: 0.2 });
+    const similarResult = fuse.search(cleanedInput);
 
-            console.log(`Pertanyaan serupa ditemukan: ${similarInput}`);
-
-            return res.json({ response: similarResponse, similar: similarInput });
-        } else {
-            return res.json({ response: "Maaf, saya belum tahu jawabannya. Mohon beri saya jawabannya!" });
-        }
-    });
-});
-
-app.post('/learn', (req, res) => {
-    const { input, response } = req.body;
-
-    // Pastikan input dan response valid
-    if (!input || !response) {
-        return res.status(400).json({ message: "Input atau respons tidak boleh kosong" });
+    if (similarResult.length > 0) {
+        return similarResult[0].item.respon;
     }
 
-    fs.readFile('./otak.json', 'utf8', (err, data) => {
+    return null;
+}
+
+// Fungsi untuk memformat respons agar lebih rapi
+function formatResponse(text) {
+    return text.replace(/\n/g, "\n\n"); // Tambahkan newline tambahan agar lebih readable
+}
+
+app.post('/chat', async (req, res) => {
+    const { input } = req.body;
+    console.log(`User input: ${input}`);
+
+    fs.readFile('./otak.json', 'utf8', async (err, data) => {
         if (err) {
             console.error("Gagal membaca file:", err);
-            return res.status(500).json({ message: "Gagal membaca data." });
+            return res.status(500).json({ message: "Terjadi kesalahan saat membaca data." });
         }
 
         let dataTraining;
@@ -73,90 +81,16 @@ app.post('/learn', (req, res) => {
         }
 
         const percakapan = dataTraining.percakapan;
+        const bestResponse = findBestMatch(input, percakapan);
 
-        // Periksa apakah input sudah ada
-        const existingEntry = percakapan.find(item => item.input.toLowerCase() === input.toLowerCase());
-        if (existingEntry) {
-            existingEntry.respon = response;
-            console.log(`Jawaban untuk "${input}" telah diperbarui.`);
-        } else {
-            percakapan.push({ input, respon: response });
-            console.log(`Data baru ditambahkan: ${input} - ${response}`);
+        if (bestResponse) {
+            return res.json({ response: formatResponse(bestResponse) });
         }
 
-        fs.writeFile('./otak.json', JSON.stringify(dataTraining, null, 2), (err) => {
-            if (err) {
-                console.error("Gagal menulis data:", err);
-                return res.status(500).json({ message: "Gagal menyimpan data." });
-            }
-
-            console.log("Data berhasil disimpan!");
-            res.json({ response: "Terima kasih, saya telah mempelajari jawaban baru!" });
-        });
+        const geminiResponse = await generateResponseFromGemini(input);
+        return res.json({ response: geminiResponse });
     });
 });
-
-// Fungsi untuk mengirim data belajar ke server
-function belajar(input, response) {
-    fetch('/learn', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            input: input,
-            response: response
-        })
-    })
-    .then(res => res.json())
-    .then(data => console.log(data))
-    .catch(err => console.log('Error:', err));
-}
-
-// Fungsi untuk bertanya ke bot
-function tanyaBot(input) {
-    fetch('/chat', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ input: input })
-    })
-    .then(res => res.json())
-    .then(data => {
-        console.log(data);
-    })
-    .catch(err => console.log('Error:', err));
-}
-
-
-function tambahPercakapanBaru(input, respon, callback) {
-    fs.readFile('./otak.json', 'utf8', (err, data) => {
-        if (err) {
-            console.error("Gagal membaca file:", err);
-            return callback(err);
-        }
-
-        let dataTraining;
-        try {
-            dataTraining = JSON.parse(data);
-        } catch (error) {
-            console.error("Error parsing JSON:", error);
-            return callback(error);
-        }
-
-        dataTraining.percakapan.push({ input, respon, kategori: "user_defined" });
-
-        fs.writeFile('./otak.json', JSON.stringify(dataTraining, null, 2), (err) => {
-            if (err) {
-                console.error("Gagal menulis file:", err);
-                return callback(err);
-            }
-            console.log("Percakapan baru berhasil disimpan!");
-            callback(null);
-        });
-    });
-}
 
 app.listen(PORT, () => {
     console.log(`Server berjalan di http://localhost:${PORT}`);
