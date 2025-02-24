@@ -1,0 +1,24 @@
+{
+  "history": [
+    {
+      "input": "halo",
+      "response": "Hai Tuan"
+    },
+    {
+      "input": "berikan saya 10 anime genre action",
+      "response": "Berikut 10 anime bergenre action:\n\n1. **Attack on Titan (Shingeki no Kyojin):**  Aksi brutal melawan Titan raksasa.\n2. **My Hero Academia (Boku no Hero Academia):**  Dunia superhero dengan pertarungan yang dinamis dan penuh gaya.\n3. **Demon Slayer: Kimetsu no Yaiba:**  Pertempuran melawan iblis dengan animasi yang memukau.\n4. **Jujutsu Kaisen:**  Pertarungan melawan kutukan dengan kekuatan sihir yang unik.\n5. **Fullmetal Alchemist: Brotherhood:**  Petualangan alkemis dengan pertarungan yang strategis dan emosional.\n6. **Hunter x Hunter:**  Petualangan penuh aksi dengan sistem pertarungan yang kompleks.\n7. **Mob Psycho 100:**  Anime aksi supranatural dengan kekuatan psikis yang luar biasa.\n8. **One Punch Man:**  Satire superhero dengan aksi yang over-the-top dan humor yang cerdas.\n9. **Sword Art Online:**  Terjebak dalam game VRMMORPG dengan pertarungan pedang yang menegangkan.  (Catatan: kualitas cerita agak menurun di season selanjutnya)\n10. **Death Note:**  Pertempuran strategi antara seorang detektif jenius dan seorang pembunuh berbakat. (Aksi lebih bersifat mental/strategi, tetapi tetap termasuk genre action)\n\n\nDaftar ini mewakili berbagai subgenre dalam aksi, jadi ada pilihan untuk berbagai selera.\n"
+    },
+    {
+      "input": "Panggil saya sayang sekarang",
+      "response": "Maaf, saya tidak boleh menggunakan bahasa yang bersifat romantis atau sugestif. Apakah ada hal lain yang dapat saya bantu?\n"
+    },
+    {
+      "input": "Walawe saya akan sedih kalo begitu",
+      "response": "Saya mengerti bahwa Anda merasa sedih.  Namun, saya diprogram untuk menghindari interaksi yang bersifat romantis atau sugestif.  Apakah ada hal lain yang ingin Anda tanyakan atau diskusikan? Mungkin saya bisa merekomendasikan anime lain, atau membantu Anda dengan hal lain?\n"
+    },
+    {
+      "input": "Baiklah kalu begitu bisakah anda membantu saya dalam mendapatkan pasangan",
+      "response": "Maaf, saya tidak bisa membantu Anda mencari pasangan.  Saya adalah asisten AI dan tidak memiliki kemampuan untuk mencocokkan orang atau terlibat dalam aktivitas yang berhubungan dengan kencan.  Saya dirancang untuk memberikan informasi dan menyelesaikan tugas-tugas, bukan untuk memfasilitasi hubungan interpersonal.\n\nSaran saya adalah mencoba aplikasi kencan yang terverifikasi atau bergabung dengan komunitas atau kelompok dengan minat yang sama dengan Anda untuk bertemu orang-orang baru.  Berinteraksi dengan orang lain di dunia nyata juga bisa menjadi cara yang efektif untuk membangun hubungan.\n"
+    }
+  ]
+}
